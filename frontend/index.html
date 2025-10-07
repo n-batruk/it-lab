@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мій Drive - Drive Clone</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Навігація -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Мій Drive</span>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3"><span id="usernameDisplay"></span></span>
+                <button class="btn btn-danger btn-sm" onclick="logout()">Вийти</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Ліва панель - Керування -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Керування файлами</h5>
+                        
+                        <!-- Завантаження файлу -->
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Завантажити файл</label>
+                            <input type="file" class="form-control" id="fileInput" accept=".c,.jpg,.jpeg">
+                            <button class="btn btn-secondary w-100 mt-2" onclick="uploadFile()">Завантажити</button>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Сортування (Варіант 1) -->
+                        <h6>Сортування</h6>
+                        <div class="btn-group w-100 mb-2" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="sortFiles('asc')">
+                                Зростання
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="sortFiles('desc')">
+                                Спадання
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mb-3">По даті створення</small>
+                        
+                        <hr>
+                        
+                        <!-- Фільтрація (Варіант 7) -->
+                        <h6>Фільтр файлів</h6>
+                        <select class="form-select mb-3" id="filterSelect" onchange="filterFiles()">
+                            <option value="all">Всі файли</option>
+                            <option value=".c">Тільки .c</option>
+                            <option value=".jpg">Тільки .jpg</option>
+                        </select>
+                        
+                        <hr>
+                        
+                        <!-- Показати/сховати колонки -->
+                        <h6>Відображення колонок</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="showCreated" checked onchange="toggleColumns()">
+                            <label class="form-check-label" for="showCreated">Дата створення</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="showModified" checked onchange="toggleColumns()">
+                            <label class="form-check-label" for="showModified">Дата зміни</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="showUploader" checked onchange="toggleColumns()">
+                            <label class="form-check-label" for="showUploader">Завантажив</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="showEditor" checked onchange="toggleColumns()">
+                            <label class="form-check-label" for="showEditor">Редагував</label>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Синхронізація папки -->
+                        <button class="btn btn-secondary w-100" onclick="syncFolder()">
+                            Синхронізувати папку
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Центральна панель - Список файлів -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Файли</h5>
+                        
+                        <div id="messageArea"></div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Ім'я файлу</th>
+                                        <th class="col-created">Дата створення</th>
+                                        <th class="col-modified">Дата зміни</th>
+                                        <th class="col-uploader">Завантажив</th>
+                                        <th class="col-editor">Редагував</th>
+                                        <th>Дії</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="filesTable">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Завантаження...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Права панель - Перегляд файлу -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Перегляд файлу</h5>
+                        <div id="previewArea" class="text-center text-muted">
+                            Оберіть файл для перегляду
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="/eel.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
