@@ -2,7 +2,6 @@ const API_URL = 'http://localhost:5000/api';
 let currentSortOrder = 'desc';
 let currentFilter = 'all';
 
-// Перевірка авторизації при завантаженні
 window.addEventListener('load', () => {
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
@@ -16,7 +15,6 @@ window.addEventListener('load', () => {
     loadFiles();
 });
 
-// Завантажити список файлів
 async function loadFiles() {
     const token = localStorage.getItem('token');
     
@@ -39,7 +37,6 @@ async function loadFiles() {
     }
 }
 
-// Відобразити файли в таблиці
 function displayFiles(files) {
     const tbody = document.getElementById('filesTable');
     
@@ -86,14 +83,12 @@ body {
     `).join('');
 }
 
-// Форматування дати
 function formatDate(dateString) {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleString('uk-UA');
 }
 
-// Завантажити файл на сервер
 async function uploadFile() {
     const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
@@ -131,7 +126,6 @@ async function uploadFile() {
     }
 }
 
-// Переглянути файл
 async function previewFile(fileId) {
     const token = localStorage.getItem('token');
     const previewArea = document.getElementById('previewArea');
@@ -161,7 +155,6 @@ async function previewFile(fileId) {
     }
 }
 
-// Завантажити файл
 async function downloadFile(fileId, filename) {
     const token = localStorage.getItem('token');
     
@@ -188,7 +181,6 @@ async function downloadFile(fileId, filename) {
     }
 }
 
-// Видалити файл
 async function deleteFile(fileId) {
     if (!confirm('Ви впевнені, що хочете видалити цей файл?')) {
         return;
@@ -217,19 +209,16 @@ async function deleteFile(fileId) {
     }
 }
 
-// Сортування (Варіант 1 - по даті створення)
 function sortFiles(order) {
     currentSortOrder = order;
     loadFiles();
 }
 
-// Фільтрація (Варіант 7 - .c, .jpg)
 function filterFiles() {
     currentFilter = document.getElementById('filterSelect').value;
     loadFiles();
 }
 
-// Показати/сховати колонки
 function toggleColumns() {
     const showCreated = document.getElementById('showCreated').checked;
     const showModified = document.getElementById('showModified').checked;
@@ -253,16 +242,35 @@ function toggleColumns() {
     });
 }
 
-// Синхронізація папки (викликає Python функцію через Eel)
-function syncFolder() {
-    if (typeof eel !== 'undefined') {
-        eel.select_and_sync_folder()();
-    } else {
-        showMessage('Синхронізація доступна тільки в десктоп-версії', 'info');
+async function syncFolder() {
+    if (typeof eel === 'undefined' || typeof eel.select_and_sync_folder !== 'function') {
+        showMessage('Синхронізація доступна тільки в десктоп-версії', 'secondary');
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showMessage('Спочатку увійдіть у систему', 'secondary');
+            return;
+        }
+        
+        showMessage('Виберіть папку для синхронізації...', 'secondary');
+        
+        const result = await eel.select_and_sync_folder(token)();
+        
+        if (result && result.message) {
+            showMessage(result.message, result.success ? 'success' : 'secondary');
+        } else {
+            showMessage('Синхронізація завершена', 'success');
+        }
+
+        setTimeout(() => loadFiles(), 1000);
+    } catch (error) {
+        console.error('Помилка синхронізації:', error);
+        showMessage('Помилка синхронізації папки', 'danger');
     }
 }
-
-// Вихід
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
@@ -270,7 +278,6 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-// Показати повідомлення
 function showMessage(message, type) {
     const messageArea = document.getElementById('messageArea');
     messageArea.innerHTML = `
@@ -285,7 +292,6 @@ function showMessage(message, type) {
     }, 5000);
 }
 
-// Escape HTML
 function escapeHtml(text) {
     const map = {
         '&': '&amp;',
@@ -295,32 +301,4 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, m => map[m]);
-}
-
-// === СИНХРОНІЗАЦІЯ ПАПКИ (тільки для Desktop версії) ===
-async function syncFolder() {
-    try {
-        console.log("🔄 Виклик синхронізації папки...");
-
-        if (typeof eel === 'undefined') {
-            alert("❌ Ця функція доступна лише у десктоп-додатку.");
-            return;
-        }
-
-        // Зчитуємо токен з localStorage (де він зберігається після логіну)
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert("⚠️ Спочатку увійдіть у систему!");
-            return;
-        }
-
-        // Передаємо токен у Python
-        const result = await eel.select_and_sync_folder(token)();
-
-        console.log("✅ Результат:", result);
-        alert(result.message || "✅ Синхронізація завершена!");
-    } catch (error) {
-        console.error("❌ Помилка синхронізації:", error);
-        alert("Помилка при синхронізації папки.");
-    }
 }
