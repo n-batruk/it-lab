@@ -13,6 +13,8 @@ window.addEventListener('load', () => {
     
     document.getElementById('usernameDisplay').textContent = username;
     loadFiles();
+    
+    initDragAndDrop();
 });
 
 async function loadFiles() {
@@ -264,7 +266,7 @@ async function syncFolder() {
         } else {
             showMessage('Синхронізація завершена', 'success');
         }
-
+        
         setTimeout(() => loadFiles(), 1000);
     } catch (error) {
         console.error('Помилка синхронізації:', error);

@@ -264,3 +264,29 @@ h1, h2, h3, h4, h5, h6 {
         margin-bottom: 20px;
     }
 }
+
+/* Drag-n-Drop Zone */
+.drop-zone {
+    border: 2px dashed #6c757d;
+    border-radius: 0.25rem;
+    padding: 20px;
+    text-align: center;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.drop-zone:hover {
+    border-color: #495057;
+    background-color: #e9ecef;
+}
+
+.drop-zone.drag-over {
+    border-color: #343a40;
+    background-color: #dee2e6;
+    border-style: solid;
+}
+
+.drop-zone p {
+    color: #6c757d;
+    margin: 0;
+}
