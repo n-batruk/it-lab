@@ -1,6 +1,8 @@
 import pytest
 import sys
 import os
+import gc
+import time
 
 # Додати шлях до backend
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -17,8 +19,21 @@ def setup_test_db():
     
     yield
     
-    if os.path.exists('test_auth.db'):
-        os.remove('test_auth.db')
+    gc.collect()
+    time.sleep(0.1)
+    
+    max_attempts = 5
+    for attempt in range(max_attempts):
+        try:
+            if os.path.exists('test_auth.db'):
+                os.remove('test_auth.db')
+            break
+        except (PermissionError, OSError) as e:
+            if attempt < max_attempts - 1:
+                time.sleep(0.2)
+                gc.collect()
+            else:
+                pass
 
 def test_hash_password():
     """Тест 1: Хешування паролю"""
