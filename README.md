@@ -1,4 +1,4 @@
-[![Tests](https://github.com/n-batruk/it-lab/actions/workflows/tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/tests.yml)
+[![Tests](https://github.com/n-batruk/it-lab/actions/workflows/tests.yml/badge.svg)](https://github.com/n-batruk/it-lab/actions/workflows/tests.yml)
 
 ## Опис проєкту
 
