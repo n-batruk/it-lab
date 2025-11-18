@@ -7,6 +7,19 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from backend.auth import hash_password, verify_password, register_user, login_user
 
+@pytest.fixture(scope='function')
+def setup_test_db():
+    """Створити тестову базу даних"""
+    import backend.database as db
+    
+    db.DB_PATH = 'test_auth.db'
+    db.init_db()
+    
+    yield
+    
+    if os.path.exists('test_auth.db'):
+        os.remove('test_auth.db')
+
 def test_hash_password():
     """Тест 1: Хешування паролю"""
     password = "test123"
@@ -34,7 +47,7 @@ def test_verify_password():
     assert verify_password("wrongpassword", hashed) == False
     assert verify_password("", hashed) == False
 
-def test_register_user():
+def test_register_user(setup_test_db):
     """Тест 3: Реєстрація користувача"""
     # Successful registration
     user_id, message = register_user("testuser123", "password123")
@@ -54,7 +67,7 @@ def test_register_user():
     user_id4, message4 = register_user("validuser", "12345")
     assert user_id4 is None
 
-def test_login_user():
+def test_login_user(setup_test_db):
     """Тест 4: Авторизація користувача"""
     # Create test user
     username = "logintest"

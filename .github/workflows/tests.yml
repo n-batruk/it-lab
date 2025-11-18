@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -44,12 +48,12 @@ jobs:
       continue-on-error: false
     
     - name: Collect test results
-      if: always()
+      if: always() && !cancelled()
       run: |
         pytest tests/ -v --tb=short --junitxml=test-results-${{ matrix.os }}-${{ matrix.python-version }}.xml || true
     
     - name: Upload test results as artifacts
-      if: always()
+      if: always() && !cancelled()
       uses: actions/upload-artifact@v4
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.python-version }}
@@ -58,7 +62,7 @@ jobs:
         retention-days: 7
     
     - name: Upload test logs as artifacts
-      if: always()
+      if: always() && !cancelled()
       uses: actions/upload-artifact@v4
       with:
         name: test-logs-${{ matrix.os }}-${{ matrix.python-version }}
